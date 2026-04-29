@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Workspace</title>
+    <script src="https://cdn.jsdelivr.net/npm/@titaniumnetwork-dev/ultraviolet@latest/dist/uv.bundle.js"></script>
+    <script>
+        // Inline configuration
+        window.__uv$config = {
+            prefix: '/service/',
+            bare: 'https://uv.radon.games/bare/', // This is a public bare server; it may change
+            encodeUrl: Ultraviolet.codec.xor.encode,
+            decodeUrl: Ultraviolet.codec.xor.decode,
+            handler: 'https://cdn.jsdelivr.net/npm/@titaniumnetwork-dev/ultraviolet@latest/dist/uv.handler.js',
+            bundle: 'https://cdn.jsdelivr.net/npm/@titaniumnetwork-dev/ultraviolet@latest/dist/uv.bundle.js',
+            config: '/index.html', 
+            sw: '/sw.js',
+        };
+    </script>
+</head>
+<body style="font-family: sans-serif; text-align: center; padding-top: 50px;">
+    <h1>Web Proxy</h1>
+    <input type="text" id="url" placeholder="Enter URL or Search" style="padding: 10px; width: 300px;">
+    <button onclick="launch()" style="padding: 10px;">Launch</button>
+
+    <script>
+        async function launch() {
+            const input = document.getElementById('url').value;
+            let url = input.trim();
+            
+            if (!url.includes('.')) url = 'https://www.google.com/search?q=' + url;
+            else if (!/^https?:\/\//.test(url)) url = 'http://' + url;
+
+            // Register the Service Worker
+            await navigator.serviceWorker.register('./sw.js', {
+                scope: __uv$config.prefix
+            });
+
+            // Redirect to the proxied URL
+            location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
+        }
+    </script>
+</body>
+</html>
