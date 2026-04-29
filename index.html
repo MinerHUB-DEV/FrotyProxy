@@ -3,42 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Workspace</title>
-    <script src="https://cdn.jsdelivr.net/npm/@titaniumnetwork-dev/ultraviolet@latest/dist/uv.bundle.js"></script>
+    <title>Google Drive - My Files</title>
+    <script src="https://cdn.jsdelivr.net/npm/@titaniumnetwork-dev/ultraviolet@3.2.6/dist/uv.bundle.js"></script>
     <script>
-        // Inline configuration
+        // Use the current path to prevent GitHub Pages 404s
+        const hostPath = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
+        
         window.__uv$config = {
-            prefix: '/service/',
-            bare: 'https://uv.radon.games/bare/', // This is a public bare server; it may change
+            prefix: hostPath + 'service/',
+            bare: 'https://v6.api.flow-mo.me/bare/', 
             encodeUrl: Ultraviolet.codec.xor.encode,
             decodeUrl: Ultraviolet.codec.xor.decode,
-            handler: 'https://cdn.jsdelivr.net/npm/@titaniumnetwork-dev/ultraviolet@latest/dist/uv.handler.js',
-            bundle: 'https://cdn.jsdelivr.net/npm/@titaniumnetwork-dev/ultraviolet@latest/dist/uv.bundle.js',
-            config: '/index.html', 
-            sw: '/sw.js',
+            handler: 'https://cdn.jsdelivr.net/npm/@titaniumnetwork-dev/ultraviolet@3.2.6/dist/uv.handler.js',
+            bundle: 'https://cdn.jsdelivr.net/npm/@titaniumnetwork-dev/ultraviolet@3.2.6/dist/uv.bundle.js',
+            config: hostPath + 'index.html',
+            sw: hostPath + 'sw.js',
         };
     </script>
 </head>
-<body style="font-family: sans-serif; text-align: center; padding-top: 50px;">
-    <h1>Web Proxy</h1>
-    <input type="text" id="url" placeholder="Enter URL or Search" style="padding: 10px; width: 300px;">
-    <button onclick="launch()" style="padding: 10px;">Launch</button>
+<body style="font-family: system-ui, sans-serif; background: #111; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0;">
+    
+    <h1 style="font-weight: 400;">FrotyProxy</h1>
+    <p style="color: #888;">Enter a URL below to start browsing</p>
+    
+    <div style="background: #222; padding: 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+        <input type="text" id="url" placeholder="https://google.com" style="padding: 12px; width: 300px; border: none; border-radius: 8px; outline: none; background: #333; color: white;">
+        <button onclick="launch()" style="padding: 12px 20px; border: none; border-radius: 8px; background: #4f46e5; color: white; cursor: pointer; font-weight: bold; margin-left: 10px;">Launch</button>
+    </div>
 
     <script>
         async function launch() {
             const input = document.getElementById('url').value;
             let url = input.trim();
             
+            if (!url) return;
             if (!url.includes('.')) url = 'https://www.google.com/search?q=' + url;
             else if (!/^https?:\/\//.test(url)) url = 'http://' + url;
 
-            // Register the Service Worker
-            await navigator.serviceWorker.register('./sw.js', {
-                scope: __uv$config.prefix
-            });
-
-            // Redirect to the proxied URL
-            location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
+            try {
+                // Register the Service Worker relative to current folder
+                await navigator.serviceWorker.register('./sw.js', {
+                    scope: __uv$config.prefix
+                });
+                
+                // Redirect using the XOR encoding
+                location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
+            } catch (err) {
+                alert('Connection Error: ' + err.message);
+            }
         }
     </script>
 </body>
