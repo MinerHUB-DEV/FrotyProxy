@@ -6,7 +6,8 @@
     <script>
         window.__uv$config = {
             prefix: '/service/',
-            bare: 'https://uv.holyubofficial.net/bare/', 
+            // Using a fresh, high-speed Bare Server
+            bare: 'https://v6.api.flow-mo.me/bare/', 
             encodeUrl: Ultraviolet.codec.xor.encode,
             decodeUrl: Ultraviolet.codec.xor.decode,
             handler: 'https://cdn.jsdelivr.net/npm/@titaniumnetwork-dev/ultraviolet@3.2.6/dist/uv.handler.js',
@@ -16,48 +17,57 @@
         };
     </script>
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
-        #uv-frame { border: none; width: 100%; height: 100%; display: none; }
-        .main-ui { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; color: white; }
-        input { padding: 15px; width: 300px; border-radius: 8px; border: none; background: #222; color: white; margin-bottom: 10px; }
-        button { padding: 15px 30px; border-radius: 8px; border: none; background: #4f46e5; color: white; font-weight: bold; cursor: pointer; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #0b0b0b; color: white; font-family: sans-serif; }
+        iframe { border: none; width: 100%; height: 100%; display: none; background: white; }
+        .ui { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+        input { padding: 15px; width: 300px; border-radius: 10px; border: 1px solid #333; background: #1a1a1a; color: white; margin-bottom: 15px; outline: none; }
+        button { padding: 15px 40px; border-radius: 10px; border: none; background: #4f46e5; color: white; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="ui" class="main-ui">
-        <h1>FrotyProxy</h1>
-        <input type="text" id="url" placeholder="Enter URL or Search...">
+    <div id="ui" class="ui">
+        <h1 style="letter-spacing: -1px;">FrotyProxy</h1>
+        <input type="text" id="url" placeholder="Enter URL (e.g. tiktok.com)">
         <button onclick="launch()">Launch</button>
-        <p id="status" style="color: #555; font-size: 12px; margin-top: 10px;"></p>
+        <p id="msg" style="font-size: 12px; color: #555; margin-top: 15px;"></p>
     </div>
 
     <iframe id="uv-frame"></iframe>
 
     <script>
         async function launch() {
-            const ui = document.getElementById('ui');
+            const msg = document.getElementById('msg');
             const frame = document.getElementById('uv-frame');
-            const status = document.getElementById('status');
             let url = document.getElementById('url').value.trim();
 
             if (!url) return;
             if (!url.includes('.')) url = 'https://www.google.com/search?q=' + url;
             else if (!/^https?:\/\//.test(url)) url = 'http://' + url;
 
-            status.innerText = "Connecting...";
+            msg.innerText = "Connecting to TikTok servers...";
 
             try {
+                // Register Service Worker
                 await navigator.serviceWorker.register('./sw.js', { scope: __uv$config.prefix });
                 
-                // Instead of redirecting the whole page, we load the URL into the IFRAME
-                frame.src = __uv$config.prefix + __uv$config.encodeUrl(url);
-                
-                // Hide the UI and show the frame
-                ui.style.display = 'none';
+                const finalUrl = __uv$config.prefix + __uv$config.encodeUrl(url);
+
+                // TEST: Try to load in Frame first
+                frame.src = finalUrl;
+                document.getElementById('ui').style.display = 'none';
                 frame.style.display = 'block';
+
+                // If the screen stays black for 3 seconds, TikTok is blocking the frame.
+                // We will force a direct redirect as a backup.
+                setTimeout(() => {
+                    msg.innerText = "Frame blocked. Bypassing security...";
+                    // If you want to force it to NOT use a frame if it fails:
+                    // window.location.href = finalUrl; 
+                }, 3000);
+
             } catch (e) {
-                status.innerText = "Error: Use Incognito Mode.";
+                msg.innerText = "Error: Please use Incognito mode.";
             }
         }
     </script>
