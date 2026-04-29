@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Google Drive - Personal</title>
+    <title>Google Drive - Workspace</title>
     <script src="https://cdn.jsdelivr.net/npm/@titaniumnetwork-dev/ultraviolet@3.2.6/dist/uv.bundle.js"></script>
     <script>
-        // This script automatically fixes the "GitHub Path" problem
+        // Automatic Path Fix for GitHub Pages
         const path = window.location.pathname.replace(/\/$/, "");
         
         window.__uv$config = {
@@ -19,37 +19,35 @@
         };
     </script>
 </head>
-<body style="background:#000; color:#fff; font-family:sans-serif; text-align:center; padding-top:20vh; margin:0;">
-    <div style="max-width:500px; margin:auto; background:#111; padding:40px; border-radius:20px; border:1px solid #333;">
-        <h2 style="margin-top:0;">Search</h2>
-        <input type="text" id="url" placeholder="https://google.com" style="width:80%; padding:15px; border-radius:10px; border:none; background:#222; color:white; margin-bottom:20px;">
+<body style="background:#000; color:#fff; font-family:sans-serif; text-align:center; padding-top:15vh; margin:0;">
+    <div style="max-width:450px; margin:auto; background:#111; padding:40px; border-radius:15px; border:1px solid #333;">
+        <h1>FrotyProxy</h1>
+        <input type="text" id="url" placeholder="https://google.com" style="width:80%; padding:12px; border-radius:8px; border:none; background:#222; color:white; margin-bottom:20px;">
         <br>
-        <button onclick="launch()" style="width:85%; padding:15px; border-radius:10px; border:none; background:#4f46e5; color:white; cursor:pointer; font-weight:bold;">Launch Proxy</button>
-        <p id="msg" style="margin-top:20px; font-size:12px; color:#555;"></p>
+        <button onclick="launch()" style="width:85%; padding:12px; border-radius:8px; border:none; background:#4f46e5; color:white; cursor:pointer; font-weight:bold;">Launch</button>
+        <p id="status" style="margin-top:20px; font-size:14px; color:#666;"></p>
     </div>
 
     <script>
         async function launch() {
-            const msg = document.getElementById('msg');
+            const status = document.getElementById('status');
             let url = document.getElementById('url').value.trim();
             if (!url) return;
             
             if (!url.includes('.')) url = 'https://www.google.com/search?q=' + url;
             else if (!/^https?:\/\//.test(url)) url = 'http://' + url;
 
-            msg.innerText = "Loading... please wait.";
+            status.innerText = "Starting proxy...";
             
             try {
-                // Registering the worker
+                // Registering the worker using the current folder path
                 await navigator.serviceWorker.register('./sw.js', {
                     scope: __uv$config.prefix
                 });
                 
-                // Final launch
                 location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
             } catch (e) {
-                msg.style.color = "red";
-                msg.innerText = "Error: " + e.message;
+                status.innerText = "Registration Error. Check if cookies are blocked.";
             }
         }
     </script>
