@@ -1,55 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Google Drive - Workspace</title>
-    <script src="https://cdn.jsdelivr.net/npm/@titaniumnetwork-dev/ultraviolet@3.2.6/dist/uv.bundle.js"></script>
-    <script>
-        // Automatic Path Fix for GitHub Pages
-        const path = window.location.pathname.replace(/\/$/, "");
-        
-        window.__uv$config = {
-            prefix: path + '/service/',
-            bare: 'https://uv.holyubofficial.net/bare/', 
-            encodeUrl: Ultraviolet.codec.xor.encode,
-            decodeUrl: Ultraviolet.codec.xor.decode,
-            handler: 'https://cdn.jsdelivr.net/npm/@titaniumnetwork-dev/ultraviolet@3.2.6/dist/uv.handler.js',
-            bundle: 'https://cdn.jsdelivr.net/npm/@titaniumnetwork-dev/ultraviolet@3.2.6/dist/uv.bundle.js',
-            config: path + '/index.html',
-            sw: path + '/sw.js',
-        };
-    </script>
-</head>
-<body style="background:#000; color:#fff; font-family:sans-serif; text-align:center; padding-top:15vh; margin:0;">
-    <div style="max-width:450px; margin:auto; background:#111; padding:40px; border-radius:15px; border:1px solid #333;">
-        <h1>FrotyProxy</h1>
-        <input type="text" id="url" placeholder="https://google.com" style="width:80%; padding:12px; border-radius:8px; border:none; background:#222; color:white; margin-bottom:20px;">
-        <br>
-        <button onclick="launch()" style="width:85%; padding:12px; border-radius:8px; border:none; background:#4f46e5; color:white; cursor:pointer; font-weight:bold;">Launch</button>
-        <p id="status" style="margin-top:20px; font-size:14px; color:#666;"></p>
-    </div>
-
-    <script>
-        async function launch() {
-            const status = document.getElementById('status');
-            let url = document.getElementById('url').value.trim();
-            if (!url) return;
-            
-            if (!url.includes('.')) url = 'https://www.google.com/search?q=' + url;
-            else if (!/^https?:\/\//.test(url)) url = 'http://' + url;
-
-            status.innerText = "Starting proxy...";
-            
-            try {
-                // Registering the worker using the current folder path
-                await navigator.serviceWorker.register('./sw.js', {
-                    scope: __uv$config.prefix
-                });
-                
-                location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
-            } catch (e) {
-                status.innerText = "Registration Error. Check if cookies are blocked.";
-            }
-        }
-    </script>
-</body>
-</html>
+window.__uv$config = {
+    prefix: '/service/',
+    bare: 'https://uv.holyubofficial.net/bare/', 
+    encodeUrl: Ultraviolet.codec.xor.encode,
+    decodeUrl: Ultraviolet.codec.xor.decode,
+    handler: 'https://cdn.jsdelivr.net/npm/@titaniumnetwork-dev/ultraviolet@3.2.6/dist/uv.handler.js',
+    bundle: 'https://cdn.jsdelivr.net/npm/@titaniumnetwork-dev/ultraviolet@3.2.6/dist/uv.bundle.js',
+    config: '/index.html',
+    sw: '/sw.js',
+};
